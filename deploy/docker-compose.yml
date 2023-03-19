@@ -12,24 +12,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      POLL_US_PLATFORM_HOST: 0.0.0.0
-      POLL_US_PLATFORM_DB_HOST: poll_us_platform-db
-      POLL_US_PLATFORM_DB_PORT: 5432
-      POLL_US_PLATFORM_DB_USER: poll_us_platform
-      POLL_US_PLATFORM_DB_PASS: poll_us_platform
-      POLL_US_PLATFORM_DB_BASE: poll_us_platform
 
   db:
     image: postgres:13.8-bullseye
     hostname: poll_us_platform-db
     environment:
-      POSTGRES_PASSWORD: "poll_us_platform"
-      POSTGRES_USER: "poll_us_platform"
-      POSTGRES_DB: "poll_us_platform"
+      POSTGRES_PASSWORD: ${POLL_US_PLATFORM_DB_PASS}
+      POSTGRES_USER: ${POLL_US_PLATFORM_DB_USER}
+      POSTGRES_DB: ${POLL_US_PLATFORM_DB_BASE}
     volumes:
     - poll_us_platform-db-data:/var/lib/postgresql/data
     restart: always
+    ports:
+    - "5432:5432"
     healthcheck:
       test: pg_isready -U poll_us_platform
       interval: 2s
@@ -40,17 +35,11 @@ services:
     image: poll_us_platform:${POLL_US_PLATFORM_VERSION:-latest}
     restart: "no"
     command: alembic upgrade head
-    environment:
-      POLL_US_PLATFORM_DB_HOST: poll_us_platform-db
-      POLL_US_PLATFORM_DB_PORT: 5432
-      POLL_US_PLATFORM_DB_USER: poll_us_platform
-      POLL_US_PLATFORM_DB_PASS: poll_us_platform
-      POLL_US_PLATFORM_DB_BASE: poll_us_platform
+    env_file:
+    - .env
     depends_on:
       db:
         condition: service_healthy
-
-
 
 volumes:
   poll_us_platform-db-data:

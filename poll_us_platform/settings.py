@@ -27,25 +27,27 @@ class Settings(BaseSettings):
     with environment variables.
     """
 
-    host: str = "127.0.0.1"
-    port: int = 8000
+    host: str
+    port: int
     # quantity of workers for uvicorn
     workers_count: int = 1
     # Enable uvicorn reloading
-    reload: bool = False
+    reload: bool
 
     # Current environment
-    environment: str = "dev"
+    environment: str
 
     log_level: LogLevel = LogLevel.INFO
 
+    secret: str
+
     # Variables for the database
-    db_host: str = "localhost"
-    db_port: int = 5432
-    db_user: str = "poll_us_platform"
-    db_pass: str = "poll_us_platform"
-    db_base: str = "poll_us_platform"
-    db_echo: bool = False
+    db_host: str
+    db_port: int
+    db_user: str
+    db_pass: str
+    db_base: str
+    db_echo: bool = True
 
     @property
     def db_url(self) -> URL:
