@@ -14,12 +14,12 @@ class UserAnswer(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
+    publish_id = Column(String(64), ForeignKey("questions.publish_id"), nullable=False)
     answer_id = Column(Integer, ForeignKey("answers.id"), nullable=True)
     content = Column(String(500), nullable=True)
 
     user = relationship(User, remote_side="User.id")
-    question = relationship(Question, remote_side="Question.id")
+    question = relationship(Question, remote_side="Question.publish_id")
     answer = relationship(Answer, remote_side="Answer.id")
 
     def __repr__(self):

@@ -11,7 +11,7 @@ class UserCreate(BaseModel):
     password: str
 
     @validator("username")
-    def validate_name(self, value):
+    def validate_name(cls, value):
         if len(value) < MIN_NAME_LENGTH:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -20,7 +20,7 @@ class UserCreate(BaseModel):
         return value
 
     @validator("password")
-    def validate_surname(self, value):
+    def validate_surname(cls, value):
         if len(value) < MIN_PASSWORD_LENGTH:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTIT,

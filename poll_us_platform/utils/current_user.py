@@ -27,7 +27,7 @@ async def get_current_user(
         raise credentials_exception
 
     async with session.begin():
-        user = await UserDal(session).get_user_by_id(id=user_id)
+        user = await UserDal(session).get_user_by_id(user_id=user_id)
         if user is None:
             raise credentials_exception
         return user

@@ -1,10 +1,11 @@
-from typing import List
+from typing import List, Union
 
-from sqlalchemy import delete, select, update
+from sqlalchemy import and_, delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from poll_us_platform.db.models.answer import Answer
 from poll_us_platform.db.models.question import Question
+from poll_us_platform.db.models.user_answer import UserAnswer
 
 
 class QuestionDal:
@@ -45,7 +46,7 @@ class QuestionDal:
         self,
         question_id: int,
         user_id: int = None,
-    ) -> Question:
+    ) -> Union[Question, None]:
         """Finds question by id"""
         query = select(Question).where(Question.id == question_id)
         if user_id:
@@ -54,6 +55,17 @@ class QuestionDal:
         user_row = user.fetchone()
         if user_row is not None:
             return user_row[0]
+
+    async def get_question_by_publish_id(
+        self,
+        publish_id: str,
+    ) -> Union[Question, None]:
+        """Finds question by publish id"""
+        query = select(Question).where(Question.publish_id == publish_id)
+        question = await self.db_session.execute(query)
+        question_row = question.fetchone()
+        if question_row is not None:
+            return question_row[0]
 
     async def delete_question(self, question_id: int, user_id: int = None) -> None:
         """Deletes question"""
@@ -116,3 +128,36 @@ class QuestionDal:
         if user_id:
             query = query.where(Question.user_id == user_id)
         await self.db_session.execute(query)
+
+    async def get_linked_answers(
+        self,
+        publish_id: str,
+    ) -> list[tuple[Union[int, None], int]]:
+        """Returns grouped answers for specific question"""
+        group_query = (
+            select(
+                UserAnswer.answer_id,
+                func.count(UserAnswer.id),
+            )
+            .filter(
+                UserAnswer.publish_id == publish_id,
+                UserAnswer.answer_id.isnot(None),
+            )
+            .group_by(
+                UserAnswer.answer_id,
+            )
+        )
+        group_result = await self.db_session.execute(group_query)
+        return group_result.fetchall()
+
+    async def get_other_answers(
+        self,
+        publish_id: str,
+    ) -> list[tuple[UserAnswer, None]]:
+        """return grouped answers for specific question"""
+        other_answers_query = select(UserAnswer).filter(
+            UserAnswer.publish_id == publish_id,
+            UserAnswer.answer_id.is_(None),
+        )
+        other_answers_result = await self.db_session.execute(other_answers_query)
+        return other_answers_result.fetchall()

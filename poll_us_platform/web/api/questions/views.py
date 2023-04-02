@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,6 +8,7 @@ from poll_us_platform.db.models.user import User
 from poll_us_platform.services.question.actions import (
     create_new_question,
     delete_question,
+    get_question_result,
     get_single_question,
     get_user_questions,
     publish_question,
@@ -15,6 +16,7 @@ from poll_us_platform.services.question.actions import (
 )
 from poll_us_platform.services.question.models import (
     QuestionCreate,
+    QuestionResult,
     QuestionShow,
     QuestionUpdate,
 )
@@ -31,6 +33,15 @@ async def question_publish(
 ) -> str:
     """Publish question"""
     return await publish_question(pk, current_user, db)
+
+
+@router.get("/questions/{publish_id}/result")
+async def question_result(
+    publish_id: str,
+    db: AsyncSession = Depends(get_db_session),
+) -> QuestionResult:
+    """Get question result"""
+    return await get_question_result(publish_id, db)
 
 
 @router.post("/questions")
@@ -54,10 +65,10 @@ async def questions_list(
 
 @router.get("/questions/{pk}")
 async def question_show(
-    pk: int,
+    pk: Union[int, str],
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
-) -> QuestionShow:
+) -> Union[QuestionShow, None]:
     """Show single question"""
     return await get_single_question(pk, current_user, db)
 

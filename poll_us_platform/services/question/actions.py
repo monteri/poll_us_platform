@@ -1,5 +1,5 @@
 import uuid
-from typing import List
+from typing import List, Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,6 +8,7 @@ from poll_us_platform.db.models.user import User
 from poll_us_platform.services.answers.models import Answer
 from poll_us_platform.services.question.models import (
     QuestionCreate,
+    QuestionResult,
     QuestionShow,
     QuestionUpdate,
 )
@@ -54,13 +55,16 @@ async def get_user_questions(
 
 
 async def get_single_question(
-    question_id: int,
+    question_id: Union[int, str],
     current_user: User,
     session: AsyncSession,
-) -> QuestionShow:
+) -> Union[QuestionShow, None]:
     async with session.begin():
         question_dal = QuestionDal(session)
-        return await question_dal.get_question_by_id(question_id, current_user.id)
+        if isinstance(question_id, int):
+            return await question_dal.get_question_by_id(question_id, current_user.id)
+
+        return await question_dal.get_question_by_publish_id(question_id)
 
 
 async def delete_question(
@@ -121,3 +125,24 @@ async def publish_question(
             current_user.id,
         )
         return publish_id
+
+
+async def get_question_result(
+    publish_id: str,
+    session: AsyncSession,
+) -> Union[QuestionResult, None]:
+    async with session.begin():
+        question_dal = QuestionDal(session)
+        question = await question_dal.get_question_by_publish_id(publish_id)
+        if not question:
+            return None
+        linked_answers = await question_dal.get_linked_answers(publish_id)
+        other_answers = await question_dal.get_other_answers(publish_id)
+        result = {"other_answers": [answer[0].content for answer in other_answers]}
+        all_count = len(other_answers)
+        for answer_id, count in linked_answers:
+            result[str(answer_id)] = count
+            all_count += count
+
+        result["count"] = all_count
+        return result
