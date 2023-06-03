@@ -49,6 +49,8 @@ class Settings(BaseSettings):
     db_base: str
     db_echo: bool = True
 
+    origins = ["*"]
+
     @property
     def db_url(self) -> URL:
         """

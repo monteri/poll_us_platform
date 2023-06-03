@@ -5,7 +5,7 @@ import jwt
 from poll_us_platform.settings import settings
 
 JWT_ALGORITHM = "HS256"
-TOKEN_DURATION = 6000
+TOKEN_DURATION = 90000
 
 
 def sign_jwt(user_id: int):

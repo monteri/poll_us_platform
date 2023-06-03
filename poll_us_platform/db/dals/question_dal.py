@@ -40,7 +40,7 @@ class QuestionDal:
         """Finds question by user_id"""
         query = select(Question).where(Question.user_id == user_id)
         questions = await self.db_session.execute(query)
-        return [question for question, _ in questions]
+        return [question[0] for question in questions]
 
     async def get_question_by_id(
         self,

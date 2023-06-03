@@ -1,6 +1,7 @@
 from typing import Literal
 
 from pydantic import BaseModel, Extra
+from pydantic.fields import Optional
 
 from poll_us_platform.services.answers.models import Answer
 
@@ -18,7 +19,7 @@ class QuestionShow(BaseModel):
     title: str
     type: Literal["single", "multiple"]
     another_option: bool
-    publish_id: str
+    publish_id: Optional[str]
     answers: list[Answer]
 
     class Config:

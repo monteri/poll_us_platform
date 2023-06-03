@@ -6,3 +6,9 @@ up:
 
 shell:
 	docker exec -it poll_us_platform-api-1 bash
+
+prod-build:
+	docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.prod.yml  --project-directory . build
+
+prod-up:
+	docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.prod.yml --project-directory . up

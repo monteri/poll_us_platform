@@ -4,7 +4,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from poll_us_platform.db.dals.user_dal import UserDal
-from poll_us_platform.services.user.models import Token, UserCreate
+from poll_us_platform.db.models.user import User
+from poll_us_platform.services.user.models import Token, UserCreate, UserShow
 from poll_us_platform.utils.hasher import Hasher
 from poll_us_platform.utils.jwt_handler import sign_jwt
 
@@ -45,3 +46,9 @@ async def authenticate_user(
             detail="Credentials are invalid",
         )
     return Token(access_token=sign_jwt(user.id))
+
+
+def retrieve_current_user(
+    current_user: User,
+) -> Union[UserShow, None]:
+    return UserShow(email=current_user.email, username=current_user.username)

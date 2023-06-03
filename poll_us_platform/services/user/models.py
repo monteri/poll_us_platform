@@ -29,6 +29,11 @@ class UserCreate(BaseModel):
         return value
 
 
+class UserShow(BaseModel):
+    username: str
+    email: EmailStr
+
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str

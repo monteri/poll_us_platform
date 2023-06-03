@@ -2,6 +2,7 @@ from asyncio import current_task
 from typing import Awaitable, Callable
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import (
     async_scoped_session,
     async_sessionmaker,
@@ -48,8 +49,14 @@ def register_startup_event(
 
     @app.on_event("startup")
     async def _startup() -> None:  # noqa: WPS430
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=settings.origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
         _setup_db(app)
-        pass  # noqa: WPS420
 
     return _startup
 
