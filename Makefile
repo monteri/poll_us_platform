@@ -17,4 +17,4 @@ prod-background:
 	docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.prod.yml --project-directory . up -d
 
 stop:
-	docker-compose stop
+	docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.prod.yml --project-directory . stop
