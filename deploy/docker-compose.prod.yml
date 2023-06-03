@@ -10,11 +10,11 @@ services:
       POLL_US_PLATFORM_RELOAD: "True"
 
   nginx:
-    build: ./nginx
+    build: ./deploy/nginx
     depends_on:
     - api
     ports:
     - "80:80"
     volumes:
-    - ./nginx:/etc/nginx/conf.d
+    - ./deploy/nginx:/etc/nginx/conf.d
     - .:/app/src/
